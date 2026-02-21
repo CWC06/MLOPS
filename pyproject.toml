@@ -1,50 +1,55 @@
-[build-system]
-requires = ["flit_core >=3.2,<4"]
-build-backend = "flit_core.buildapi"
-
-[project]
-name = "mlops_assignment"
-version = "0.0.1"
-description = "project assignment for mlops module"
-authors = [
-  { name = "Chin Wei Cong \u0026 Teagan Tham" },
-]
-
+[tool.poetry]
+name = "mlops-assignment"
+version = "0.1.0"
+description = "MLOps Assignment: Lung Cancer Risk Prediction"
+authors = ["Your Name <you@example.com>"]
 readme = "README.md"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    
-]
-dependencies = [
-    "ipython",
-    "jupyterlab",
-    "loguru",
-    "matplotlib",
-    "mkdocs",
-    "notebook",
-    "numpy",
-    "pandas",
-    "pip",
-    "pytest",
-    "python-dotenv",
-    "ruff",
-    "scikit-learn",
-    "tqdm",
-    "typer",
-    "pycaret (>=3.3.2,<4.0.0)",
-]
-requires-python = "~=3.10.0"
+package-mode = false
 
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
 
-[tool.ruff]
-line-length = 99
-src = ["mlops_assignment"]
-include = ["pyproject.toml", "mlops_assignment/**/*.py"]
+# Core data science
+pandas = ">=2.0.0,<3.0.0"
+numpy = ">=1.24.0,<2.0.0"
+scikit-learn = ">=1.4.0,<1.5.0"
+joblib = ">=1.2.0,<1.4.0"
 
-[tool.ruff.lint]
-extend-select = ["I"]  # Add import sorting
+# AutoML / low-code
+pycaret = ">=3.3.0,<4.0.0"
 
-[tool.ruff.lint.isort]
-known-first-party = ["mlops_assignment"]
-force-sort-within-sections = true
+# Experiment tracking & orchestration
+mlflow = ">=2.8.0,<3.0.0"
+hydra-core = ">=1.3.0,<2.0.0"
+dvc = ">=3.0.0,<4.0.0"
 
+# App / dashboard
+streamlit = ">=1.28.0,<2.0.0"
+
+# Monitoring
+evidently = ">=0.4.0,<1.0.0"
+
+# Notebooks & visualization
+jupyter = ">=1.0.0,<2.0.0"
+matplotlib = ">=3.7.0,<4.0.0"
+seaborn = ">=0.12.0,<1.0.0"
+plotly = ">=5.17.0,<6.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.4.0"
+flake8 = ">=6.1.0"
+mypy = ">=1.5.0"
+black = ">=23.9.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py39']
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
