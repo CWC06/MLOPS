@@ -11,7 +11,7 @@ A fully integrated MLOps pipeline combining **Heart Disease Risk Prediction** (b
 ## Team Members
 
 | Name | Role | Dataset |
-|---|---|---|---|
+|---|---|---|
 | **Wei Cong** | Team Leader | Heart Disease (UCI) |
 | **Teagan Tham** | Member | Lung Cancer |
 
