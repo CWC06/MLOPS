@@ -1,29 +1,48 @@
+"""Plotting utilities for model evaluation."""
+
+import os
 from pathlib import Path
 
 from loguru import logger
-from tqdm import tqdm
-import typer
+from pycaret.classification import plot_model
 
-from mlops_assignment.config import FIGURES_DIR, PROCESSED_DATA_DIR
-
-app = typer.Typer()
+from mlops_assignment.config import FIGURES_DIR
 
 
-@app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    input_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
-    output_path: Path = FIGURES_DIR / "plot.png",
-    # -----------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Generating plot from data...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Plot generation complete.")
-    # -----------------------------------------
+def save_evaluation_plots(
+    model,
+    output_dir: Path | None = None,
+    plot_types: list[str] | None = None,
+) -> Path:
+    """Save static evaluation plots from PyCaret's plot_model.
 
+    Parameters
+    ----------
+    model : trained PyCaret model (pre-finalization for valid CV plots)
+    output_dir : Path
+        Directory to save PNGs.
+    plot_types : list[str]
+        PyCaret plot identifiers to generate.
 
-if __name__ == "__main__":
-    app()
+    Returns
+    -------
+    Path to the output directory.
+    """
+    if output_dir is None:
+        output_dir = FIGURES_DIR
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    if plot_types is None:
+        plot_types = ["confusion_matrix", "auc", "pr", "class_report", "feature", "learning"]
+
+    orig_dir = os.getcwd()
+    try:
+        os.chdir(str(output_dir))
+        for name in plot_types:
+            logger.info(f"  Saving plot: {name}")
+            plot_model(model, plot=name, save=True)
+    finally:
+        os.chdir(orig_dir)
+
+    logger.info(f"All plots saved to: {output_dir}")
+    return output_dir

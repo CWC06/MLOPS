@@ -1,0 +1,42 @@
+data:
+  raw_path: ../data/raw/heart.csv
+  processed_path: data/processed/heart_processed.csv
+  test_size: 0.2        # PyCaret internal train/test split (applied to training pool only)
+  holdout_size: 0.10    # Stratified holdout kept entirely outside PyCaret for final inference demo
+  random_state: 42
+
+model:
+  experiment_name: heart_disease_experiment
+  target_column: HeartDisease
+  metric: AUC           # AUC is the primary metric — robust to class imbalance and threshold-agnostic
+  fold: 5               # 5-fold stratified cross-validation
+  n_select: 3           # Keep top-3 models from compare_models for inspection
+
+preprocessing:
+  normalize: true
+  normalize_method: zscore
+  feature_selection: true
+  feature_selection_method: univariate
+  remove_multicollinearity: true
+  multicollinearity_threshold: 0.85   # 0.85 removes genuinely redundant features (was 0.95, too permissive)
+  bin_numeric_features:               # Clinically meaningful continuous features to discretise
+    - Age
+    - Cholesterol
+    - RestingBP
+    - MaxHR
+  create_interaction_features: true   # Captures non-linear cross-feature relationships
+
+tuning:
+  optimize: AUC         # Must match model.metric — both optimise the same objective
+  n_iter: 30            # 30 random-search iterations (was 10 — too few for LightGBM/XGBoost space)
+  random_state: 42
+
+mlflow:
+  tracking_uri: ./mlruns
+  model_name: heart_disease_model
+  model_stage: staging  # Alias applied after registration (replaces deprecated lifecycle stages)
+
+paths:
+  model_save_path: models/heart_disease_model
+  reports_path: reports/figures
+

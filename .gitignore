@@ -1,5 +1,21 @@
-# Data
-/data/
+# Data (processed/interim managed separately; raw tracked by DVC)
+data/processed/
+data/interim/
+data/external/
+
+# MLflow tracking
+mlruns/
+
+# Hydra outputs
+outputs/
+
+# Log files
+logs.log
+
+# Notebook temp artifacts
+notebooks/data/
+notebooks/mlruns/
+notebooks/reports/
 
 # Mac OS-specific storage files
 .DS_Store
