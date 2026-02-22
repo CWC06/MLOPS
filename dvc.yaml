@@ -1,0 +1,42 @@
+stages:
+  train_heart:
+    cmd: python -c "
+      from mlops_assignment.dataset import load_heart_data;
+      from mlops_assignment.features import create_holdout_split;
+      from mlops_assignment.modeling.train import init_pycaret, train_best_model, save_pipeline;
+      import yaml;
+      cfg = yaml.safe_load(open('configs/config_heart.yaml'));
+      df = load_heart_data(cfg['data']['raw_path']);
+      train_df, holdout_df = create_holdout_split(df, cfg['data']['holdout_size'], cfg['data']['random_state']);
+      best = init_pycaret(train_df, cfg);
+      best = train_best_model(best);
+      save_pipeline(best, cfg['paths']['model_save_path'])
+      "
+    deps:
+      - data/raw/heart.csv
+      - configs/config_heart.yaml
+      - mlops_assignment/dataset.py
+      - mlops_assignment/features.py
+      - mlops_assignment/modeling/train.py
+    outs:
+      - models/heart_disease_model.pkl:
+          cache: true
+    metrics:
+      - reports/figures/heart_metrics.json:
+          cache: false
+    plots:
+      - reports/figures/heart_confusion_matrix.png:
+          cache: false
+
+  train_lung_cancer:
+    cmd: python src/models/train_lung_cancer.py
+    deps:
+      - data/raw/lung_cancer.csv
+      - configs/config_lung_cancer.yaml
+      - src/models/train_lung_cancer.py
+    outs:
+      - models/lung_cancer_model.pkl:
+          cache: true
+    metrics:
+      - reports/figures/lung_cancer/lung_cancer_metrics.json:
+          cache: false

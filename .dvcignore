@@ -1,0 +1,16 @@
+# Add patterns of files DVC should ignore (similar to .gitignore)
+# Ignore Python cache
+__pycache__
+*.pyc
+
+# Ignore virtual environments
+.venv
+venv
+
+# Ignore IDE files
+.idea
+.vscode
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
