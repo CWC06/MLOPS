@@ -10,21 +10,10 @@ A fully integrated MLOps pipeline combining **Heart Disease Risk Prediction** (b
 
 ## Team Members
 
-| Name | Role | Dataset | Responsibilities |
+| Name | Role | Dataset |
 |---|---|---|---|
-| **Wei Cong** | Team Leader | Heart Disease (UCI) | Heart disease pipeline, Streamlit webapp, Hydra configs, cloud deployment |
-| **Teagan Tham** | Member | Lung Cancer | DVC data version control, CI/CD pipelines, lung cancer pipeline support |
-
----
-
-## URLs
-
-| Resource | URL |
-|---|---|
-| Source Code Repository | https://github.com/CWC06/MLOPS |
-| Web Application (cloud) | Deployed via Railway — run `streamlit run src/webapp/app.py` locally or deploy with `Dockerfile` |
-| Web Application (local) | http://localhost:8501 |
-| MLflow Tracking UI (local) | http://localhost:5000 |
+| **Wei Cong** | Team Leader | Heart Disease (UCI) |
+| **Teagan Tham** | Member | Lung Cancer |
 
 ---
 
