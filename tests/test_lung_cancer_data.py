@@ -3,7 +3,6 @@
 from pathlib import Path
 
 import pandas as pd
-import pytest
 
 DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "raw" / "lung_cancer.csv"
 

@@ -4,15 +4,14 @@ from pathlib import Path
 
 import pandas as pd
 from loguru import logger
+from pycaret.classification import predict_model
 from sklearn.metrics import (
     accuracy_score,
+    f1_score,
     precision_score,
     recall_score,
-    f1_score,
     roc_auc_score,
 )
-
-from pycaret.classification import predict_model
 
 from mlops_assignment.config import PROCESSED_DATA_DIR
 

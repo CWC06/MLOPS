@@ -1,8 +1,9 @@
 """Shared utility functions for model training and prediction."""
 
-import pandas as pd
+from typing import Any, Dict
+
 import numpy as np
-from typing import Dict, Any
+import pandas as pd
 
 
 def load_data(data_path: str) -> pd.DataFrame:

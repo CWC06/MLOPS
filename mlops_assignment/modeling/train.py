@@ -5,14 +5,13 @@ from pathlib import Path
 import pandas as pd
 from loguru import logger
 from omegaconf import DictConfig
-
 from pycaret.classification import (
-    setup,
     compare_models,
-    tune_model,
     finalize_model,
-    save_model,
     pull,
+    save_model,
+    setup,
+    tune_model,
 )
 
 from mlops_assignment.config import MODELS_DIR

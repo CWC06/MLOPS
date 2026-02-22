@@ -1,8 +1,8 @@
 """Basic tests for the heart disease dataset and pipeline."""
 
-import pandas as pd
-import pytest
 from pathlib import Path
+
+import pandas as pd
 
 
 DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "raw" / "heart.csv"
