@@ -1,2 +1,3 @@
-/heart.csv
-/lung_cancer.csv
+# DVC-tracked files (also committed to git for CI compatibility)
+# Large datasets should use DVC remote storage only;
+# these small files are kept in git for CI/CD pipeline access.
