@@ -8,6 +8,25 @@ A fully integrated MLOps pipeline combining **Heart Disease Risk Prediction** (b
 
 ---
 
+## Team Members
+
+| Name | Role | Dataset | Responsibilities |
+|---|---|---|---|
+| **Wei Cong** | Team Leader | Heart Disease (UCI) | Heart disease pipeline, Streamlit webapp, Hydra configs, cloud deployment |
+| **Teagan Tham** | Member | Lung Cancer | DVC data version control, CI/CD pipelines, lung cancer pipeline support |
+
+---
+
+## URLs
+
+| Resource | URL |
+|---|---|
+| Source Code Repository | https://github.com/CWC06/MLOPS |
+| Web Application (local) | http://localhost:8501 |
+| MLflow Tracking UI (local) | http://localhost:5000 |
+
+---
+
 ## Models at a Glance
 
 | Model | Task | Target | Dataset |
@@ -20,101 +39,149 @@ A fully integrated MLOps pipeline combining **Heart Disease Risk Prediction** (b
 ## Project Structure
 
 ```
-mlops-assignment/
+MLOPS/
+│
+├── .github/workflows/               # CI/CD Pipelines
+│   ├── ci.yml                       # Lint → Test → Build pipeline
+│   └── deploy.yml                   # Auto-deploy to Render on push
+│
+├── .dvc/                            # DVC configuration
+│   └── config                       # Remote storage settings
+├── .dvcignore                       # DVC exclusion rules
+├── dvc.yaml                         # Reproducible training pipeline
+│
+├── .streamlit/
+│   └── config.toml                  # Streamlit theme & server config
 │
 ├── configs/
-│   ├── config_heart.yaml          # Heart disease pipeline config (Hydra)
-│   └── config_lung_cancer.yaml    # Lung cancer pipeline config (Hydra)
+│   ├── config_heart.yaml            # Heart disease pipeline config (Hydra)
+│   └── config_lung_cancer.yaml      # Lung cancer pipeline config (Hydra)
 │
 ├── data/
 │   ├── raw/
-│   │   ├── heart.csv              # UCI Heart Disease dataset
-│   │   └── lung_cancer.csv        # Lung Cancer Risk dataset
-│   ├── processed/                 # Holdout splits (auto-generated)
+│   │   ├── heart.csv                # UCI Heart Disease dataset
+│   │   ├── heart.csv.dvc            # DVC tracking file
+│   │   ├── lung_cancer.csv          # Lung Cancer Risk dataset
+│   │   └── lung_cancer.csv.dvc      # DVC tracking file
+│   ├── processed/                   # Holdout splits (auto-generated)
 │   ├── interim/
 │   └── external/
 │
-├── mlops_assignment/              # Heart disease core package
-│   ├── config.py                  # Path constants (PROJ_ROOT, DATA_DIR, …)
-│   ├── dataset.py                 # Data loading & cleaning
-│   ├── features.py                # Holdout split creation
-│   ├── plots.py                   # PyCaret evaluation plot utilities
+├── mlops_assignment/                # Heart disease core package
+│   ├── config.py                    # Path constants (PROJ_ROOT, DATA_DIR, …)
+│   ├── dataset.py                   # Data loading & cleaning
+│   ├── features.py                  # Holdout split creation
+│   ├── plots.py                     # PyCaret evaluation plot utilities
 │   └── modeling/
-│       ├── train.py               # PyCaret training functions
-│       └── predict.py             # Holdout evaluation & metrics
+│       ├── train.py                 # PyCaret training functions
+│       └── predict.py               # Holdout evaluation & metrics
 │
 ├── src/
 │   ├── models/
-│   │   ├── train_lung_cancer.py   # Lung cancer training pipeline (Hydra)
-│   │   ├── predict_lung_cancer.py # Lung cancer inference utilities
-│   │   ├── predict_heart.py       # Heart disease inference utilities
-│   │   └── utils.py               # Shared data utilities
+│   │   ├── train_lung_cancer.py     # Lung cancer training pipeline (Hydra + MLflow)
+│   │   ├── predict_lung_cancer.py   # Lung cancer inference utilities
+│   │   ├── predict_heart.py         # Heart disease inference utilities
+│   │   └── utils.py                 # Shared data utilities
 │   └── webapp/
-│       └── app.py                 # Integrated Streamlit application
+│       └── app.py                   # Integrated Streamlit application
 │
 ├── models/
-│   ├── heart_disease_model.pkl    # Trained heart disease pipeline
-│   └── lung_cancer_model.pkl      # Trained lung cancer pipeline
+│   ├── heart_disease_model.pkl      # Trained heart disease pipeline
+│   └── lung_cancer_model.pkl        # Trained lung cancer pipeline
 │
 ├── notebooks/
-│   └── train_heart.ipynb          # Heart disease training notebook
+│   └── train_heart.ipynb            # Heart disease EDA + training notebook
 │
 ├── reports/
-│   └── figures/                   # Auto-generated evaluation plots
+│   └── figures/                     # Auto-generated evaluation plots
 │
 ├── tests/
-│   ├── test_data.py               # Heart disease data tests
-│   └── test_lung_cancer_data.py   # Lung cancer data tests
+│   ├── test_data.py                 # Heart disease data tests
+│   ├── test_lung_cancer_data.py     # Lung cancer data tests
+│   └── test_model.py               # Model inference tests
 │
-├── mlruns/                        # MLflow experiment tracking
-├── Makefile                       # Project automation
-├── pyproject.toml                 # Poetry dependencies
-└── README.md
+├── docs/                            # MkDocs documentation
+│   ├── mkdocs.yml
+│   └── docs/
+│       ├── index.md
+│       └── getting-started.md
+│
+├── Dockerfile                       # Container for cloud deployment
+├── .dockerignore                    # Docker build exclusions
+├── render.yaml                      # Render PaaS deployment config
+├── requirements.txt                 # Pip dependencies (exported from Poetry)
+├── Makefile                         # Project automation commands
+├── pyproject.toml                   # Poetry dependency manifest
+├── poetry.lock                      # Locked dependency versions
+└── README.md                        # This file
 ```
 
 ---
 
-## Quick Start
+## Deployment Guide
 
-### 1 · Install dependencies
+### Local Development
 
 ```bash
+# 1. Clone the repository
+git clone https://github.com/CWC06/MLOPS.git
+cd MLOPS
+
+# 2. Install dependencies with Poetry
 poetry install
 poetry shell
-```
 
-### 2 · Train the models
-
-```bash
-# Heart Disease model
-make train-heart
-
-# Lung Cancer model
-make train-lung
-
-# Both at once
+# 3. Train both models
 make train-all
-```
 
-### 3 · Launch the web app
-
-```bash
+# 4. Launch the web application
 make webapp
-# → http://localhost:8501
-```
+# → opens at http://localhost:8501
 
-### 4 · View MLflow experiments
-
-```bash
+# 5. View MLflow experiment tracking
 make mlflow-ui
-# → http://localhost:5000
+# → opens at http://localhost:5000
 ```
 
-### 5 · Run tests
+### Cloud Deployment (Render)
 
-```bash
-make test
-```
+The project includes a `Dockerfile` and `render.yaml` for one-click deployment:
+
+1. Push the repository to GitHub
+2. Connect the repo to [Render](https://render.com)
+3. Render auto-detects `render.yaml` and deploys the Streamlit app
+4. The app runs in a Docker container with all dependencies pre-installed
+
+### Cloud Deployment (Streamlit Community Cloud)
+
+1. Push the repository to GitHub
+2. Go to [share.streamlit.io](https://share.streamlit.io)
+3. Connect the GitHub repo and set the main file path to `src/webapp/app.py`
+4. The app deploys automatically
+
+---
+
+## User Guide
+
+### Web Application
+
+The Streamlit webapp provides real-time health risk predictions for two models:
+
+**Selecting a Model:**
+- Use the sidebar radio button to switch between "Heart Disease Risk" and "Lung Cancer Risk"
+
+**Single Prediction:**
+1. Select the "Single Prediction" tab
+2. Fill in all input fields (patient demographics, clinical features)
+3. Click "Predict"
+4. View the risk result (colour-coded) and confidence probabilities
+
+**Batch Prediction:**
+1. Select the "Batch Prediction" tab
+2. Upload a CSV file with the correct column headers
+3. Preview the uploaded data
+4. Click "Run Batch Prediction"
+5. Download the results as a CSV file
 
 ---
 
@@ -174,32 +241,42 @@ lung_cancer.csv
   ↓ tune_model()               — hyperparameter optimisation (10 iterations)
   ↓ finalize_model()           — train on full dataset
   ↓ save_model()               — models/lung_cancer_model.pkl
-  ↓ MLflow log_model()         — register & promote to Staging
+  ↓ MLflow log_model()         — register & promote to staging
 ```
 
 ---
 
-## Web Application (`src/webapp/app.py`)
+## MLOps Lifecycle Tools
 
-The Streamlit app provides a unified interface for both models:
-
-| Feature | Details |
-|---|---|
-| **Model toggle** | Sidebar radio button — Heart Disease or Lung Cancer |
-| **Single prediction** | Form inputs → real model inference → colour-coded risk result |
-| **Batch prediction** | Upload CSV → predictions on all rows → download as CSV |
-| **Confidence scores** | Per-class probability table shown with each prediction |
-| **Risk colours** | Red (High/Disease) · Orange (Medium) · Green (Low/No Disease) |
+| Tool | Role | Integration |
+|---|---|---|
+| [Poetry](https://python-poetry.org/) | Dependency management | `pyproject.toml` + `poetry.lock` |
+| [Hydra](https://hydra.cc/) | Config management | `configs/*.yaml`, CLI overrides |
+| [DVC](https://dvc.org/) | Data version control | `dvc.yaml`, `data/raw/*.dvc` |
+| [MLflow](https://mlflow.org/) | Experiment tracking & model registry | `mlruns/`, model staging |
+| [PyCaret](https://pycaret.org/) | AutoML pipeline | Training, preprocessing, model selection |
+| [Streamlit](https://streamlit.io/) | Web application | `src/webapp/app.py` |
+| [GitHub Actions](https://github.com/features/actions) | CI/CD | `.github/workflows/ci.yml` |
+| [Docker](https://www.docker.com/) | Containerisation | `Dockerfile` for cloud deployment |
+| [Render](https://render.com/) | PaaS deployment | `render.yaml` |
+| [Loguru](https://loguru.readthedocs.io/) | Structured logging | Application-wide logging |
 
 ---
 
-## Candidate Models
+## Make Commands
 
-### Heart Disease (sorted by AUC)
-LightGBM · Random Forest · XGBoost · Logistic Regression · Naive Bayes · Decision Tree · SVM
-
-### Lung Cancer (sorted by Accuracy)
-LightGBM · Logistic Regression
+| Command | Description |
+|---|---|
+| `make train-heart` | Train heart disease model |
+| `make train-lung` | Train lung cancer model |
+| `make train-all` | Train both models |
+| `make webapp` | Launch Streamlit app (localhost:8501) |
+| `make mlflow-ui` | Launch MLflow tracking UI (localhost:5000) |
+| `make test` | Run pytest suite |
+| `make lint` | Lint with ruff |
+| `make format` | Format with ruff |
+| `make clean` | Remove Python caches |
+| `make help` | Show all commands |
 
 ---
 
@@ -226,39 +303,6 @@ LightGBM · Logistic Regression
 
 23 risk-factor features scored on a 1–9 scale (Age and Gender use natural scales).
 **Target**: `Level` — Low · Medium · High cancer risk.
-
----
-
-## Make Commands
-
-| Command | Description |
-|---|---|
-| `make requirements` | Install package with pip |
-| `make train-heart` | Train heart disease model |
-| `make train-lung` | Train lung cancer model |
-| `make train-all` | Train both models |
-| `make webapp` | Launch Streamlit app |
-| `make mlflow-ui` | Launch MLflow tracking UI |
-| `make test` | Run pytest suite |
-| `make lint` | Lint with ruff |
-| `make format` | Format with ruff |
-| `make clean` | Remove Python caches |
-| `make help` | Show all commands |
-
----
-
-## Tech Stack
-
-| Tool | Role |
-|---|---|
-| [PyCaret](https://pycaret.org/) | AutoML — compare, tune, preprocess |
-| [MLflow](https://mlflow.org/) | Experiment tracking & model registry |
-| [Hydra](https://hydra.cc/) | Config management & CLI overrides |
-| [Streamlit](https://streamlit.io/) | Interactive web application |
-| [DVC](https://dvc.org/) | Data version control |
-| [Evidently](https://www.evidentlyai.com/) | Model monitoring |
-| [Loguru](https://loguru.readthedocs.io/) | Structured logging |
-| [Poetry](https://python-poetry.org/) | Dependency management |
 
 ---
 

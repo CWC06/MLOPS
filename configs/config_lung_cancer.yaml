@@ -27,9 +27,8 @@ tuning:
 
 mlflow:
   tracking_uri: ./mlruns
-  registry_uri: ./mlruns
   model_name: lung_cancer_risk_model
-  model_stage: Staging
+  model_stage: staging
 
 paths:
   model_save_path: models/lung_cancer_model

@@ -1,16 +1,20 @@
 stages:
   train_heart:
-    cmd: python -c "
+    cmd: >-
+      python -c "
       from mlops_assignment.dataset import load_heart_data;
       from mlops_assignment.features import create_holdout_split;
       from mlops_assignment.modeling.train import init_pycaret, train_best_model, save_pipeline;
-      import yaml;
-      cfg = yaml.safe_load(open('configs/config_heart.yaml'));
-      df = load_heart_data(cfg['data']['raw_path']);
-      train_df, holdout_df = create_holdout_split(df, cfg['data']['holdout_size'], cfg['data']['random_state']);
-      best = init_pycaret(train_df, cfg);
-      best = train_best_model(best);
-      save_pipeline(best, cfg['paths']['model_save_path'])
+      from mlops_assignment.plots import save_evaluation_plots;
+      from omegaconf import OmegaConf;
+      cfg = OmegaConf.load('configs/config_heart.yaml');
+      df = load_heart_data();
+      df_train, _ = create_holdout_split(df, target=cfg.model.target_column, holdout_size=cfg.data.holdout_size, random_state=cfg.data.random_state);
+      init_pycaret(df_train, cfg);
+      final, tuned, _, _ = train_best_model(cfg);
+      save_pipeline(final);
+      save_evaluation_plots(tuned);
+      print('Heart disease model trained and saved.')
       "
     deps:
       - data/raw/heart.csv
@@ -21,12 +25,6 @@ stages:
     outs:
       - models/heart_disease_model.pkl:
           cache: true
-    metrics:
-      - reports/figures/heart_metrics.json:
-          cache: false
-    plots:
-      - reports/figures/heart_confusion_matrix.png:
-          cache: false
 
   train_lung_cancer:
     cmd: python src/models/train_lung_cancer.py
@@ -37,6 +35,3 @@ stages:
     outs:
       - models/lung_cancer_model.pkl:
           cache: true
-    metrics:
-      - reports/figures/lung_cancer/lung_cancer_metrics.json:
-          cache: false
