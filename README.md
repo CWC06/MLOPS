@@ -22,6 +22,7 @@ A fully integrated MLOps pipeline combining **Heart Disease Risk Prediction** (b
 | Resource | URL |
 |---|---|
 | Source Code Repository | https://github.com/CWC06/MLOPS |
+| Web Application (cloud) | Deployed via Railway — run `streamlit run src/webapp/app.py` locally or deploy with `Dockerfile` |
 | Web Application (local) | http://localhost:8501 |
 | MLflow Tracking UI (local) | http://localhost:5000 |
 
@@ -90,7 +91,8 @@ MLOPS/
 │   └── lung_cancer_model.pkl        # Trained lung cancer pipeline
 │
 ├── notebooks/
-│   └── train_heart.ipynb            # Heart disease EDA + training notebook
+│   ├── eda_heart_disease.ipynb      # Heart disease EDA (Task 1 — Wei Cong)
+│   └── train_heart.ipynb            # Heart disease training notebook (Task 2 — Wei Cong)
 │
 ├── reports/
 │   └── figures/                     # Auto-generated evaluation plots
