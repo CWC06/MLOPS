@@ -1,0 +1,36 @@
+data:
+  raw_path: data/raw/lung_cancer.csv
+  processed_path: data/processed/lung_cancer_processed.csv
+  test_size: 0.2
+  random_state: 42
+
+model:
+  experiment_name: lung_cancer_experiment
+  target_column: Level
+  metric: Accuracy         # Accuracy suits balanced multiclass (Low/Medium/High)
+  fold: 5                  # 5-fold stratified cross-validation
+  n_select: 3              # Keep top-3 models for inspection
+
+preprocessing:
+  normalize: true
+  feature_selection: true
+  remove_multicollinearity: true
+  multicollinearity_threshold: 0.95
+  bin_numeric_features:
+    - Age
+  create_interaction_features: true
+
+tuning:
+  optimize: Accuracy
+  n_iter: 10               # 10 random-search iterations
+  random_state: 42
+
+mlflow:
+  tracking_uri: ./mlruns
+  registry_uri: ./mlruns
+  model_name: lung_cancer_risk_model
+  model_stage: Staging
+
+paths:
+  model_save_path: models/lung_cancer_model
+  reports_path: reports/figures/lung_cancer
