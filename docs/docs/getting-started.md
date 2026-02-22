@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- Python 3.10 or 3.11
+- Python 3.10 or later
 - [Poetry](https://python-poetry.org/docs/#installation) for dependency management
 - Git for version control
 
@@ -25,12 +25,11 @@ poetry shell
 Both models must be trained before the web application can serve predictions.
 
 ```bash
-# Train both models (heart disease + lung cancer)
-make train-all
+# Train heart disease model
+python -c "from mlops_assignment.dataset import load_heart_data; from mlops_assignment.features import create_holdout_split; from mlops_assignment.modeling.train import init_pycaret, train_best_model, save_pipeline; from mlops_assignment.plots import save_evaluation_plots; from omegaconf import OmegaConf; cfg = OmegaConf.load('configs/config_heart.yaml'); df = load_heart_data(); df_train, _ = create_holdout_split(df, target=cfg.model.target_column, holdout_size=cfg.data.holdout_size, random_state=cfg.data.random_state); init_pycaret(df_train, cfg); final, tuned, _, _ = train_best_model(cfg); save_pipeline(final); save_evaluation_plots(tuned)"
 
-# Or train individually
-make train-heart
-make train-lung
+# Train lung cancer model
+python src/models/train_lung_cancer.py
 ```
 
 Trained models are saved to the `models/` directory.
@@ -38,7 +37,7 @@ Trained models are saved to the `models/` directory.
 ## Launch the Web Application
 
 ```bash
-make webapp
+streamlit run src/webapp/app.py
 ```
 
 The Streamlit app will open at [http://localhost:8501](http://localhost:8501).
@@ -46,26 +45,25 @@ The Streamlit app will open at [http://localhost:8501](http://localhost:8501).
 ## Run Tests
 
 ```bash
-make test
+python -m pytest tests -v
 ```
 
 ## View Experiment Tracking
 
 ```bash
-make mlflow-ui
+mlflow ui --backend-store-uri ./mlruns --port 5000
 ```
 
 The MLflow dashboard will open at [http://localhost:5000](http://localhost:5000).
 
-## Project Commands Reference
+## Quick Commands Reference
 
-| Command | Description |
+| Task | Command |
 |---------|-------------|
-| `make train-heart` | Train heart disease model |
-| `make train-lung` | Train lung cancer model |
-| `make train-all` | Train both models |
-| `make webapp` | Launch Streamlit app |
-| `make mlflow-ui` | Launch MLflow UI |
-| `make test` | Run pytest suite |
-| `make lint` | Lint code with ruff |
-| `make format` | Format code with ruff |
+| Train heart disease model | See training command above |
+| Train lung cancer model | `python src/models/train_lung_cancer.py` |
+| Launch Streamlit app | `streamlit run src/webapp/app.py` |
+| Launch MLflow UI | `mlflow ui --backend-store-uri ./mlruns --port 5000` |
+| Run tests | `python -m pytest tests -v` |
+| Lint code | `ruff check .` |
+| Format code | `ruff check --fix . && ruff format .` |

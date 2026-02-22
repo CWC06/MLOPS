@@ -43,7 +43,7 @@ MLOPS/
 │
 ├── .github/workflows/               # CI/CD Pipelines
 │   ├── ci.yml                       # Lint → Test → Build pipeline
-│   └── deploy.yml                   # Auto-deploy to Render on push
+│   └── deploy.yml                   # Auto-deploy to Railway on push
 │
 ├── .dvc/                            # DVC configuration
 │   └── config                       # Remote storage settings
@@ -108,7 +108,7 @@ MLOPS/
 │
 ├── Dockerfile                       # Container for cloud deployment
 ├── .dockerignore                    # Docker build exclusions
-├── render.yaml                      # Render PaaS deployment config
+├── railway.json                     # Railway PaaS deployment config
 ├── requirements.txt                 # Pip dependencies (exported from Poetry)
 ├── Makefile                         # Project automation commands
 ├── pyproject.toml                   # Poetry dependency manifest
@@ -131,33 +131,31 @@ cd MLOPS
 poetry install
 poetry shell
 
-# 3. Train both models
-make train-all
+# 3. Train heart disease model
+python -c "from mlops_assignment.dataset import load_heart_data; from mlops_assignment.features import create_holdout_split; from mlops_assignment.modeling.train import init_pycaret, train_best_model, save_pipeline; from mlops_assignment.plots import save_evaluation_plots; from omegaconf import OmegaConf; cfg = OmegaConf.load('configs/config_heart.yaml'); df = load_heart_data(); df_train, _ = create_holdout_split(df, target=cfg.model.target_column, holdout_size=cfg.data.holdout_size, random_state=cfg.data.random_state); init_pycaret(df_train, cfg); final, tuned, _, _ = train_best_model(cfg); save_pipeline(final); save_evaluation_plots(tuned)"
 
-# 4. Launch the web application
-make webapp
+# 4. Train lung cancer model
+python src/models/train_lung_cancer.py
+
+# 5. Launch the web application
+streamlit run src/webapp/app.py
 # → opens at http://localhost:8501
 
-# 5. View MLflow experiment tracking
-make mlflow-ui
+# 6. View MLflow experiment tracking
+mlflow ui --backend-store-uri ./mlruns --port 5000
 # → opens at http://localhost:5000
 ```
 
-### Cloud Deployment (Render)
+### Cloud Deployment (Railway)
 
-The project includes a `Dockerfile` and `render.yaml` for one-click deployment:
-
-1. Push the repository to GitHub
-2. Connect the repo to [Render](https://render.com)
-3. Render auto-detects `render.yaml` and deploys the Streamlit app
-4. The app runs in a Docker container with all dependencies pre-installed
-
-### Cloud Deployment (Streamlit Community Cloud)
+The project includes a `Dockerfile` and `railway.json` for deployment on [Railway](https://railway.com):
 
 1. Push the repository to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Connect the GitHub repo and set the main file path to `src/webapp/app.py`
-4. The app deploys automatically
+2. Go to [railway.com](https://railway.com) and create a new project
+3. Select **Deploy from GitHub repo** and connect `CWC06/MLOPS`
+4. Railway auto-detects the `Dockerfile` and deploys the Streamlit app
+5. Set the `PORT` environment variable to `8501` in Railway dashboard
+6. The app is accessible at the generated Railway public URL
 
 ---
 
@@ -258,25 +256,22 @@ lung_cancer.csv
 | [Streamlit](https://streamlit.io/) | Web application | `src/webapp/app.py` |
 | [GitHub Actions](https://github.com/features/actions) | CI/CD | `.github/workflows/ci.yml` |
 | [Docker](https://www.docker.com/) | Containerisation | `Dockerfile` for cloud deployment |
-| [Render](https://render.com/) | PaaS deployment | `render.yaml` |
+| [Railway](https://railway.com/) | PaaS deployment | `railway.json` + `Dockerfile` |
 | [Loguru](https://loguru.readthedocs.io/) | Structured logging | Application-wide logging |
 
 ---
 
-## Make Commands
+## Quick Commands Reference
 
-| Command | Description |
+| Task | Command |
 |---|---|
-| `make train-heart` | Train heart disease model |
-| `make train-lung` | Train lung cancer model |
-| `make train-all` | Train both models |
-| `make webapp` | Launch Streamlit app (localhost:8501) |
-| `make mlflow-ui` | Launch MLflow tracking UI (localhost:5000) |
-| `make test` | Run pytest suite |
-| `make lint` | Lint with ruff |
-| `make format` | Format with ruff |
-| `make clean` | Remove Python caches |
-| `make help` | Show all commands |
+| Train heart disease model | `python -c "from mlops_assignment.dataset import load_heart_data; ..."` (see Deployment Guide above) |
+| Train lung cancer model | `python src/models/train_lung_cancer.py` |
+| Launch Streamlit app | `streamlit run src/webapp/app.py` |
+| Launch MLflow UI | `mlflow ui --backend-store-uri ./mlruns --port 5000` |
+| Run tests | `python -m pytest tests -v` |
+| Lint code | `ruff check .` |
+| Format code | `ruff check --fix . && ruff format .` |
 
 ---
 
@@ -309,7 +304,7 @@ lung_cancer.csv
 ## Troubleshooting
 
 **`FileNotFoundError: model not found`**
-Train the relevant model first (`make train-heart` or `make train-lung`).
+Train the relevant model first (see Deployment Guide above).
 
 **LightGBM feature name warnings**
 Handled automatically — column names are normalised (spaces → underscores) before training and inference.
